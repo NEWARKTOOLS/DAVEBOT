@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="dashboard" class="section">
+  <div class="section-header">
+    <h2>Dashboard</h2>
+    <p>Track current workload, quotes in flight, and tooling progress at a glance.</p>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <h3>Active Jobs</h3>
+      <p class="card-value" id="metric-jobs">0</p>
+      <span class="card-note">From enquiry to sampling</span>
+    </div>
+    <div class="card">
+      <h3>Quotes Sent</h3>
+      <p class="card-value" id="metric-quotes">0</p>
+      <span class="card-note">Awaiting PO or feedback</span>
+    </div>
+    <div class="card">
+      <h3>Inventory Items</h3>
+      <p class="card-value" id="metric-inventory">0</p>
+      <span class="card-note">Ancillaries, plates, materials</span>
+    </div>
+  </div>
+</section>
+
+<section id="jobs" class="section">
+  <div class="section-header">
+    <h2>Jobs</h2>
+    <p>Create and track toolmaking work from enquiry to delivery.</p>
+  </div>
+  <div class="grid two">
+    <form class="panel" id="job-form">
+      <h3>Create Job</h3>
+      <label>Customer ID<input name="customer_id" placeholder="UUID" required /></label>
+      <label>Job Type
+        <select name="job_type">
+          <option value="new_tool">New Tool</option>
+          <option value="diecast">Diecast Tool</option>
+          <option value="repair">Repair</option>
+          <option value="modification">Modification</option>
+          <option value="one_off">One Off</option>
+        </select>
+      </label>
+      <label>Status
+        <select name="status">
+          <option value="enquiry">Enquiry</option>
+          <option value="quoted">Quoted</option>
+          <option value="ordered">Ordered</option>
+          <option value="in_design">Design</option>
+          <option value="machining">Machining</option>
+          <option value="assembly">Assembly</option>
+          <option value="sampling">Sampling</option>
+          <option value="delivered">Delivered</option>
+          <option value="closed">Closed</option>
+        </select>
+      </label>
+      <button type="submit">Create Job</button>
+      <div class="form-status" id="job-status"></div>
+    </form>
+    <div class="panel">
+      <h3>Job List</h3>
+      <div class="table" id="job-table"></div>
+    </div>
+  </div>
+</section>
+
+<section id="quotes" class="section">
+  <div class="section-header">
+    <h2>Quotes</h2>
+    <p>Generate quotes with assumptions and line items.</p>
+  </div>
+  <div class="grid two">
+    <form class="panel" id="quote-form">
+      <h3>Create Quote</h3>
+      <label>Customer ID<input name="customer_id" placeholder="UUID" required /></label>
+      <label>Job ID (optional)<input name="job_id" placeholder="UUID" /></label>
+      <label>Line Item Description<input name="line_description" placeholder="Labor - CNC" /></label>
+      <label>Line Item Unit Cost<input name="line_unit_cost" type="number" step="0.01" /></label>
+      <label>Line Item Quantity<input name="line_quantity" type="number" step="1" value="1" /></label>
+      <button type="submit">Create Quote</button>
+      <div class="form-status" id="quote-status"></div>
+    </form>
+    <div class="panel">
+      <h3>Quote List</h3>
+      <div class="table" id="quote-table"></div>
+    </div>
+  </div>
+</section>
+
+<section id="inventory" class="section">
+  <div class="section-header">
+    <h2>Inventory</h2>
+    <p>Track ancillaries, plates, and materials with reorder points.</p>
+  </div>
+  <div class="grid two">
+    <form class="panel" id="inventory-form">
+      <h3>Add Inventory Item</h3>
+      <label>Description<input name="description" placeholder="P20 Plate" required /></label>
+      <label>Category
+        <select name="category">
+          <option value="ancillary">Ancillary</option>
+          <option value="plate">Plate</option>
+          <option value="material">Material</option>
+          <option value="standard_component">Standard Component</option>
+          <option value="consumable">Consumable</option>
+        </select>
+      </label>
+      <label>Unit<input name="unit" placeholder="kg" required /></label>
+      <label>Stock on Hand<input name="stock_on_hand" type="number" step="0.01" required /></label>
+      <label>Reorder Point<input name="reorder_point" type="number" step="0.01" /></label>
+      <button type="submit">Add Item</button>
+      <div class="form-status" id="inventory-status"></div>
+    </form>
+    <div class="panel">
+      <h3>Inventory List</h3>
+      <div class="table" id="inventory-table"></div>
+    </div>
+  </div>
+</section>
+
+<section id="calculators" class="section">
+  <div class="section-header">
+    <h2>Quote Calculators</h2>
+    <p>Estimate tooling and moulding costs using configurable parameters.</p>
+  </div>
+  <div class="grid two">
+    <form class="panel" id="tooling-calculator">
+      <h3>Tooling Quote</h3>
+      <label>Engineering Hours<input name="engineering_hours" type="number" step="0.1" value="10" /></label>
+      <label>Machining Hours<input name="machining_hours" type="number" step="0.1" value="20" /></label>
+      <label>Labor Rate/hr<input name="labor_rate_per_hour" type="number" step="0.01" value="50" /></label>
+      <label>Material Cost<input name="material_cost" type="number" step="0.01" value="1000" /></label>
+      <label>Component Cost<input name="component_cost" type="number" step="0.01" value="500" /></label>
+      <label>Overhead Rate<input name="overhead_rate" type="number" step="0.01" value="0.1" /></label>
+      <label>Margin Rate<input name="margin_rate" type="number" step="0.01" value="0.2" /></label>
+      <button type="submit">Calculate Tooling Quote</button>
+      <pre class="result" id="tooling-result">Awaiting input...</pre>
+    </form>
+    <form class="panel" id="moulding-calculator">
+      <h3>Moulding Quote</h3>
+      <label>Part Weight (kg)<input name="part_weight_kg" type="number" step="0.01" value="0.1" /></label>
+      <label>Material Cost/kg<input name="material_cost_per_kg" type="number" step="0.01" value="3" /></label>
+      <label>Cycle Time (sec)<input name="cycle_time_seconds" type="number" step="1" value="30" /></label>
+      <label>Machine Rate/hr<input name="machine_rate_per_hour" type="number" step="0.01" value="60" /></label>
+      <label>Scrap Rate<input name="scrap_rate" type="number" step="0.01" value="0.05" /></label>
+      <label>Packaging Cost/unit<input name="packaging_cost_per_unit" type="number" step="0.01" value="0.1" /></label>
+      <label>Margin Rate<input name="margin_rate" type="number" step="0.01" value="0.2" /></label>
+      <button type="submit">Calculate Moulding Quote</button>
+      <pre class="result" id="moulding-result">Awaiting input...</pre>
+    </form>
+  </div>
+</section>
+
+<section id="assistant" class="section">
+  <div class="section-header">
+    <h2>DAVEBOT Assistant</h2>
+    <p>Ask Dav(e) about toolmaking. Uses canned knowledge until we wire up a real assistant.</p>
+  </div>
+  <div class="panel">
+    <div class="chat" id="assistant-chat">
+      <div class="chat-message bot">Howdy! I'm DAVEBOT. Ask about moulding quotes, tool steel, or job progress.</div>
+    </div>
+    <form class="chat-form" id="assistant-form">
+      <input name="question" placeholder="Ask DAVEBOT something..." required />
+      <button type="submit">Ask</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
