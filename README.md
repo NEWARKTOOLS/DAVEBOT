@@ -4,7 +4,7 @@ DAVEBOT is a toolmaking and moulding work management system (WMS) concept modele
 
 ## What this repo contains
 
-This repository currently provides a product blueprint and data model to guide implementation. It captures:
+This repository currently provides a product blueprint and a runnable API prototype. It captures:
 
 - A WMS domain model for toolmaking jobs (new tools, diecast tools, repairs/mods, one-offs)
 - A quote lifecycle that generates customer documentation with company branding
@@ -15,10 +15,21 @@ This repository currently provides a product blueprint and data model to guide i
 
 Start with the docs in the `docs/` folder.
 
+## Run the API prototype
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+Then open `http://localhost:8000/docs` for the interactive API.
+
 ## Next steps (implementation sketch)
 
 1. Build a web UI (dashboard + quoting + WMS tracking).
-2. Implement the data model and calculation engine.
+2. Implement persistence (database) and authentication.
 3. Add document templating for branded quotes and job packs.
 4. Add a DAVEBOT assistant layer with domain formulas and FAQs.
 
