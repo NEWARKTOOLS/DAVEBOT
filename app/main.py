@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Dict, List, Optional
 from uuid import UUID, uuid4
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 
 
 class JobType(str, Enum):
@@ -181,8 +181,8 @@ boms: Dict[UUID, BOMItem] = {}
 
 
 @app.get("/")
-def root():
-    return jsonify({"message": "DAVEBOT WMS is running", "docs": "/health"})
+def index():
+    return render_template("index.html")
 
 
 @app.get("/health")
